@@ -1,3 +1,4 @@
+/* Created on : 03/28/2018  */
 import mongoose from 'mongoose';
 import { empSchema } from '../model/model';
 
@@ -13,7 +14,7 @@ export const addNewEmp = (req,res) => {
         if(err){
 
             res.status(409);
-            res.send('User already exist'+ err);
+            res.send('User already exist');
         }
         res.json(emp);
     });
@@ -41,7 +42,7 @@ export const getUserByUserName  = (req,res) => {
     }
     else if(JSON.stringify(emp) === '[]'){
         //res.statusCode = 404;
-        res.status(404).json();
+        res.status(404).json('Not Found');
     }
     else{
         res.status(200).json(emp);
@@ -65,24 +66,32 @@ export const updateEmp = (req,res) => {
 
 // Delete Employee
 export const deleteEmp = (req,res) =>{
-    empCollection.findByIdAndRemove({userName: req.params.userName},(err)=>{
+   
+    
+    
+    empCollection.find({ userName: req.params.userName}, (err,emp) =>{
         if(err){
-            res.status(404);
-            res.send('Not found');
+            
+            res.status(500).json(err);
         }
-        res.json('Employee deletedasdas');
-    })
+        else if(JSON.stringify(emp) === '[]'){
+            //res.statusCode = 404;
+            res.status(404).json('Not Found');
+        }
+        else{
+            empCollection.remove({userName: req.params.userName},(err,emp)=>{
+                if(err){
+                    res.status(404).json(err);
+                }
+                else{
+                    res.json('Employee deleted');
+                }
+        
+            });
+        }
+        
+    });
+        
+    
+   
 }
-
-
-/*const isEmpty = (obj) => {
-  //  console.log(obj);
-    if (obj === null ||
-        obj === undefined ||
-        Array.isArray(obj) ||
-        typeof obj !== 'object'
-    ) {
-        return true;
-    }
-    return Object.getOwnPropertyNames(obj).length === 0 ? true : false;
-};*/
